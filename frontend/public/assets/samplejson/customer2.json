@@ -1,0 +1,12 @@
+{
+	"id": 2,
+	"name": "ABCD",
+	"email": "abcd@test.com",
+	"phone": "987654321",
+	"city": "Wuhan",
+	"state": "Hubei",
+	"country": "China",
+	"organization": "Company 2",
+	"jobProfile": "Software Developer",
+	"additionalInfo": "This is additional info for customer 2"
+}
