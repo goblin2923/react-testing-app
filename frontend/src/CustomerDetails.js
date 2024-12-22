@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import Panel from 'react-bootstrap/lib/Panel'
+import React, { Component } from 'react';
+import { Card } from 'react-bootstrap';
 import axios from 'axios'
 
 //This Component is a child Component of Customers Component
@@ -35,22 +35,22 @@ export default class CustomerDetails extends Component {
     if (!this.state.customerDetails)
       return (<p>Loading Data</p>)
     return (<div className="customerdetails">
-      <Panel bsStyle="info" className="centeralign">
-        <Panel.Heading>
-          <Panel.Title componentClass="h3">{this.state.customerDetails.data.name}</Panel.Title>
-        </Panel.Heading>
-        <Panel.Body>
-          <p>Name : {this.state.customerDetails.data.name}</p>
-          <p>Email : {this.state.customerDetails.data.email}</p>
-          <p>Phone : {this.state.customerDetails.data.phone}</p>
-          <p>City : {this.state.customerDetails.data.city}</p>
-          <p>State : {this.state.customerDetails.data.state}</p>
-          <p>Country : {this.state.customerDetails.data.country}</p>
-          <p>Organization : {this.state.customerDetails.data.organization}</p>
-          <p>Job Profile : {this.state.customerDetails.data.jobProfile}</p>
-          <p>Additional Info : {this.state.customerDetails.data.additionalInfo}</p>
-        </Panel.Body>
-      </Panel>
+      <Card bg="info" text="white" className="centeralign" style={{ padding: '20px' }}>
+        <Card.Header as="h3">{this.state.customerDetails.data.name}</Card.Header>
+        <Card.Body>
+          <Card.Text>
+            <p>Name : {this.state.customerDetails.data.name}</p>
+            <p>Email : {this.state.customerDetails.data.email}</p>
+            <p>Phone : {this.state.customerDetails.data.phone}</p>
+            <p>City : {this.state.customerDetails.data.city}</p>
+            <p>State : {this.state.customerDetails.data.state}</p>
+            <p>Country : {this.state.customerDetails.data.country}</p>
+            <p>Organization : {this.state.customerDetails.data.organization}</p>
+            <p>Job Profile : {this.state.customerDetails.data.jobProfile}</p>
+            <p>Additional Info : {this.state.customerDetails.data.additionalInfo}</p>
+          </Card.Text>
+        </Card.Body>
+      </Card>
     </div>)
   }
 }

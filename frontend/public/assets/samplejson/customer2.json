@@ -3,10 +3,10 @@
 	"name": "ABCD",
 	"email": "abcd@test.com",
 	"phone": "987654321",
-	"city": "Mangalore",
-	"state": "karnataka",
-	"country": "India",
+	"city": "Wuhan",
+	"state": "Hubei",
+	"country": "China",
 	"organization": "Company 2",
 	"jobProfile": "Software Developer",
-	"additionalInfo": "Buys Products Rarely"
+	"additionalInfo": "This is additional info for customer 2"
 }
