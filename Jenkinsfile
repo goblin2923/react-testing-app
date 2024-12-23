@@ -7,15 +7,17 @@ pipeline {
         APP_DIR = '/var/www/app' // Replace with your app's deployment directory
     }
 
-    stages {
+   stages {
         stage('Checkout Code') {
             steps {
-                echo 'Fetching code from dev branch...'
-                git branch: 'dev', url: 'git@github.com:goblin2923/react-testing-app'
+                echo 'Fetching code from the dev branch...'
+                git branch: 'dev', 
+                    url: 'git@github.com:goblin2923/react-testing-app', 
+                    credentialsId: 'react-github-token' // ID of GitHub SSH credentials
             }
         }
 
-        stage('Build Docker Containers') {
+        stage('Build Docker Images') {
             steps {
                 echo 'Building Docker images...'
                 sh '''
@@ -26,10 +28,12 @@ pipeline {
 
         stage('Deploy to Dev Environment') {
             steps {
-                echo 'Deploying application to Dev environment...'
+                echo 'Deploying application to the Dev environment...'
                 sshagent (credentials: [SSH_CREDENTIALS_ID]) {
                     sh '''
-                    ssh ${DEV_SERVER} "cd ${APP_DIR} && git pull origin dev && docker-compose up -d"
+                    ssh ${DEV_SERVER} "mkdir -p ${APP_DIR}"
+                    scp -r ./build/* ${DEV_SERVER}:${APP_DIR}/
+                    ssh ${DEV_SERVER} "cd ${APP_DIR} && docker-compose up -d"
                     '''
                 }
             }
