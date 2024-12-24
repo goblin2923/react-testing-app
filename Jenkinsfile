@@ -2,18 +2,18 @@ pipeline {
     agent any
 
     environment {
-        DEV_SERVER = 'ubuntu@13.233.144.106' // Replace with your Dev server's IP
-        SSH_CREDENTIALS_ID = '2e49be1c-6b70-48d5-a094-b569e7afae66' // Use the ID of your SSH credentials
-        APP_DIR = '/var/www/app' // Replace with your app's deployment directory
+        DEV_SERVER = 'ubuntu@13.233.144.106' // EC2 instance's IP
+        SSH_CREDENTIALS_ID = '2e49be1c-6b70-48d5-a094-b569e7afae66' // SSH credentials for AWS EC2
+        APP_DIR = '/var/www/app' // Deployment directory on EC2
     }
 
-   stages {
+    stages {
         stage('Checkout Code') {
             steps {
                 echo 'Fetching code from the dev branch...'
-                git branch: 'dev', 
-                    url: 'git@github.com:goblin2923/react-testing-app', 
-                    credentialsId: 'react-github-token' // ID of GitHub SSH credentials
+                git branch: 'dev',
+                    url: 'git@github.com:goblin2923/react-testing-app',
+                    credentialsId: 'react-github-token' // GitHub SSH credentials for authentication
             }
         }
 
@@ -23,6 +23,11 @@ pipeline {
                 sh '''
                 docker-compose build
                 '''
+            }
+                catch (Exception e) {
+                    error "Docker build failed: ${e.getMessage()}"
+                }
+
             }
         }
 
