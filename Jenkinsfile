@@ -26,27 +26,27 @@ pipeline {
                 } catch (Exception e) {
                     error "Docker build failed: ${e.getMessage()}"
                 }
+
             }
         }
     }
 
         stage('Deploy to Dev Environment') {
             steps {
-                script {
-                    echo 'Deploying application to the Dev environment...'
-                    // Use powershell for Windows SSH commands
-                    withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
-                        powershell """
-                            # Create directory on remote server
-                            ssh -i "\${env:SSH_KEY}" ${DEV_SERVER} "mkdir -p ${APP_DIR}"
-                            
-                            # Copy build files to remote server
-                            scp -i "\${env:SSH_KEY}" -r .\\build\\* ${DEV_SERVER}:${APP_DIR}/
-                            
-                            # Start Docker containers on remote server
-                            ssh -i "\${env:SSH_KEY}" ${DEV_SERVER} "cd ${APP_DIR} && docker-compose up -d"
-                        """
-                    }
+
+                echo 'Deploying application to the Dev environment...'
+                withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
+                    // Using Windows-compatible commands
+                    bat """
+                        echo "Creating directory on remote server..."
+                        ssh -i "%SSH_KEY%" ${DEV_SERVER} "mkdir -p ${APP_DIR}"
+                        
+                        echo "Copying files to remote server..."
+                        scp -i "%SSH_KEY%" -r .\\build\\* ${DEV_SERVER}:${APP_DIR}/
+                        
+                        echo "Starting Docker containers on remote server..."
+                        ssh -i "%SSH_KEY%" ${DEV_SERVER} "cd ${APP_DIR} && docker-compose up -d"
+                    """
                 }
             }
         }
