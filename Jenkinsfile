@@ -13,6 +13,19 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Test SSH Connectivity') {
+        steps {
+            script {
+                echo 'Testing SSH connection to the EC2 instance...'
+                sshagent (credentials: [SSH_CREDENTIALS_ID]) {
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no ${DEV_SERVER} "echo SSH connection successful"
+                    '''
+                }
+            }
+        }
+}
+
 
         stage('Build App on EC2') {
             steps {
