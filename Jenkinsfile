@@ -10,16 +10,17 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                script {
-                    try {
-                        echo 'Fetching code from the dev branch...'
-                        git branch: 'dev',
-                            url: 'git@github.com:goblin2923/react-testing-app',
-                            credentialsId: 'react-github-token' 
-                    } catch (Exception e) {
-                        echo "Error during git checkout: ${e.message}"
-                    }
-                }
+                // script {
+                //     try {
+                //         echo 'Fetching code from the dev branch...'
+                //         git branch: 'dev',
+                //             url: 'git@github.com:goblin2923/react-testing-app',
+                //             credentialsId: 'react-github-token' 
+                //     } catch (Exception e) {
+                //         echo "Error during git checkout: ${e.message}"
+                //     }
+                // }
+                checkout scm;
             }
         }
 
