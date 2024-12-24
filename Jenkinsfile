@@ -2,11 +2,17 @@ pipeline {
     agent any
 
     environment {
-        DEV_SERVER = 'ubuntu@13.233.144.106' // EC2 instance IP
+        DEV_SERVER = 'ubuntu@13.233.144.106' // EC2 instance's IP
         SSH_CREDENTIALS_ID = '2e49be1c-6b70-48d5-a094-b569e7afae66' // SSH credentials for AWS EC2
         APP_DIR = '/var/www/app' 
     }
 
+    stages {
+        stage('Checkout Code') {
+            steps {
+                checkout scm;
+            }
+        }
 
         stage('Build Docker Images') {
             steps {
@@ -22,13 +28,7 @@ pipeline {
                 }
             }
         }
-        stage{
-            stage('Checkout Code'){
-                steps{
-                    checkout scm;
-                }
-            }
-        }
+
         stage('Deploy to Dev Environment') {
             steps {
                 script {
