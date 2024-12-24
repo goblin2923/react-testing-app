@@ -15,7 +15,7 @@ pipeline {
                         echo 'Fetching code from the dev branch...'
                         git branch: 'dev',
                             url: 'git@github.com:goblin2923/react-testing-app',
-                            credentialsId: 'react-github-token' // GitHub SSH credentials for authentication
+                            credentialsId: 'react-github-token' 
                     } catch (Exception e) {
                         echo "Error during git checkout: ${e.message}"
                     }
