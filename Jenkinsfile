@@ -13,19 +13,19 @@ pipeline {
                 checkout scm
             }
         }
+
         stage('Test SSH Connectivity') {
-        steps {
-            script {
-                echo 'Testing SSH connection to the EC2 instance...'
-                sshagent (credentials: [SSH_CREDENTIALS_ID]) {
-                    sh '''
-                    ssh -o StrictHostKeyChecking=no ${DEV_SERVER} "echo SSH connection successful"
-                    '''
+            steps {
+                script {
+                    echo 'Testing SSH connection to the EC2 instance...'
+                    sshagent (credentials: [SSH_CREDENTIALS_ID]) {
+                        sh '''
+                        ssh -o StrictHostKeyChecking=no ${DEV_SERVER} "echo SSH connection successful"
+                        '''
+                    }
                 }
             }
         }
-}
-
 
         stage('Build App on EC2') {
             steps {
@@ -33,15 +33,13 @@ pipeline {
                     echo 'Building the app on the EC2 instance...'
                     sshagent (credentials: [SSH_CREDENTIALS_ID]) {
                         sh '''
-                        ssh ${DEV_SERVER} "
+                        ssh -o StrictHostKeyChecking=no ${DEV_SERVER} "
                             echo 'Starting build process on ${DEV_SERVER}...' &&
-                            echo 'APP_DIR: ${APP_DIR}' &&
                             mkdir -p ${APP_DIR} &&
                             cd ${APP_DIR} &&
                             git clone https://github.com/goblin2923/react-testing-app.git . &&
                             npm install &&
-                            nohup npm run build &
-                        "
+                            nohup npm run build &"
                         '''
                     }
                 }
@@ -54,10 +52,9 @@ pipeline {
                     echo 'Deploying the app on the EC2 instance...'
                     sshagent (credentials: [SSH_CREDENTIALS_ID]) {
                         sh '''
-                        ssh ${DEV_SERVER} "
+                        ssh -o StrictHostKeyChecking=no ${DEV_SERVER} "
                             cd ${APP_DIR} &&
-                            docker-compose up -d
-                        "
+                            docker-compose up -d"
                         '''
                     }
                 }
