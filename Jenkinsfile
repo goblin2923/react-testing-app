@@ -17,15 +17,18 @@ pipeline {
             }
         }
 
-        stage('Build Docker Images') {
-            steps {
-                script {
+       stage('Build Docker Images') {
+        steps {
+            script {
+                try {
                     echo 'Building Docker images...'
-                    // Use bat for Windows
                     bat 'docker-compose build'
+                } catch (Exception e) {
+                    error "Docker build failed: ${e.getMessage()}"
                 }
             }
         }
+    }
 
         stage('Deploy to Dev Environment') {
             steps {
