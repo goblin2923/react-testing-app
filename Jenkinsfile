@@ -13,19 +13,27 @@ pipeline {
                 echo 'Fetching code from the dev branch...'
                 git branch: 'dev', 
                     url: 'git@github.com:goblin2923/react-testing-app', 
-                    credentialsId: 'react-ssh-key'
+                    credentialsId: 'react-github-token'
             }
         }
 
-        stage('Build Docker Images') {
-            steps {
-                echo 'Building Docker images...'
-                bat 'docker-compose build'
+       stage('Build Docker Images') {
+        steps {
+            script {
+                try {
+                    echo 'Building Docker images...'
+                    bat 'docker-compose build'
+                } catch (Exception e) {
+                    error "Docker build failed: ${e.getMessage()}"
+                }
+
             }
         }
+    }
 
         stage('Deploy to Dev Environment') {
             steps {
+
                 echo 'Deploying application to the Dev environment...'
                 withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                     // Using Windows-compatible commands
