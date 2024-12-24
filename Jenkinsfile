@@ -22,7 +22,13 @@ pipeline {
                 }
             }
         }
-
+        stage{
+            stage('Checkout Code'){
+                steps{
+                    checkout scm;
+                }
+            }
+        }
         stage('Deploy to Dev Environment') {
             steps {
                 script {
