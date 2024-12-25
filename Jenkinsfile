@@ -34,7 +34,7 @@ pipeline {
             steps {
                 script {
                     echo 'Building the app on the EC2 instance...'
-                    sshagent(credentials: ['goblin2923']) {
+                    sshagent(credentials: ['github-ssh-key']) {
                         sh '''
                         ssh -o StrictHostKeyChecking=no ubuntu@13.233.144.106 "
                             mkdir -p /var/www/app &&
