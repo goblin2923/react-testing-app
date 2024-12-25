@@ -30,7 +30,7 @@ pipeline {
             }
         }
 
-        stage('Build App on EC2') {
+       stage('Build App on EC2') {
             steps {
                 script {
                     try {
@@ -39,7 +39,7 @@ pipeline {
                             bat """
                             echo Building the app on EC2...
                             icacls "%GIT_SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
-                            ssh -i "%GIT_SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "mkdir -p ${env.APP_DIR} && cd ${env.APP_DIR} && git clone git@github.com:goblin2923/react-testing-app.git . && npm install && npm run build"
+                            ssh -i "%GIT_SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "mkdir -p ${env.APP_DIR} && cd ${env.APP_DIR} && ssh-keyscan github.com >> ~/.ssh/known_hosts && git clone git@github.com:goblin2923/react-testing-app.git . && npm install && npm run build"
                             """
                         }
                     } catch (Exception e) {
@@ -48,7 +48,6 @@ pipeline {
                 }
             }
         }
-
 
         stage('Deploy App on EC2') {
             steps {
