@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DEV_SERVER = 'ubuntu@13.233.144.106'
-        SSH_CREDENTIALS_ID = 'es2-key-pub' // Matched to the credential ID from the logs
+        SSH_CREDENTIALS_ID = 'es2-key-pub'
         APP_DIR = '/var/www/app'
     }
 
@@ -20,6 +20,9 @@ pipeline {
                     echo 'Testing SSH connection to the EC2 instance...'
                     withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                         bat """
+                            # Fix permissions for SSH key
+                            icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F" /grant:r "JENKINS:F"
+                            # Test SSH connection
                             ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "echo SSH connection successful"
                         """
                     }
@@ -33,6 +36,9 @@ pipeline {
                     echo 'Building the app on the EC2 instance...'
                     withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                         bat """
+                            # Fix permissions for SSH key
+                            icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F" /grant:r "JENKINS:F"
+                            # Build app on EC2
                             ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "mkdir -p ${env.APP_DIR} && cd ${env.APP_DIR} && git clone https://github.com/goblin2923/react-testing-app.git . && npm install && npm run build"
                         """
                     }
@@ -46,6 +52,9 @@ pipeline {
                     echo 'Deploying the app on the EC2 instance...'
                     withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                         bat """
+                            # Fix permissions for SSH key
+                            icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F" /grant:r "JENKINS:F"
+                            # Deploy app on EC2
                             ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "cd ${env.APP_DIR} && docker-compose up -d"
                         """
                     }
