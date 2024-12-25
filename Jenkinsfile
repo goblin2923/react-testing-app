@@ -54,34 +54,21 @@ pipeline {
         
         stage('Merge to Master') {
             when {
-                expression { 
-                    return env.GIT_BRANCH == 'origin/testing' 
+                expression {
+                    return currentBuild.result == 'SUCCESS'
                 }
             }
             steps {
                 script {
-                    withCredentials([sshUserPrivateKey(credentialsId: env.GITHUB_SSH_KEY, keyFileVariable: 'GITHUB_KEY')]) {
-                        sshagent (credentials: ['GITHUB_KEY']) {
-                            sh '''
-                                # Checkout the master branch
-                                git checkout master  
-                                
-                                # Pull latest changes
-                                git pull origin master  
-                                
-                                # Merge testing into master
-                                git merge testing
-                                
-                                # Push the changes to the remote repository
-                                git push origin master  
-
-                                echo 'Merged testing branch into master branch.'
-                            '''
-                        }
+                    withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
+                        sh '''
+                            # SSH into the server and merge changes into the master branch
+                            ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $TEST_SERVER "cd ~/react-testing-app && git checkout master && git merge testing && git push origin master"
+                        '''
                     }
                 }
             }
-        }
+    }
     }
     
     post {
