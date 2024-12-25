@@ -36,18 +36,7 @@ pipeline {
                     withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                         bat """
                             icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
-                            
-                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no %DEV_SERVER% ^
-                            "mkdir -p %APP_DIR% ^
-                            && cd %APP_DIR% ^
-                            && rm -rf * ^
-                            && git clone https://github.com/goblin2923/react-testing-app.git . ^
-                            && npm install ^
-                            && npm run build ^
-                            && docker build -t react-app . ^
-                            && docker stop react-app-container || true ^
-                            && docker rm react-app-container || true ^
-                            && docker run -d --name react-app-container -p 80:80 react-app"
+                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no %DEV_SERVER% "mkdir -p %APP_DIR% && cd %APP_DIR% && rm -rf * && git clone https://github.com/goblin2923/react-testing-app.git . && npm install && npm run build && docker build -t react-app . && docker stop react-app-container || true && docker rm react-app-container || true && docker run -d --name react-app-container -p 80:80 react-app"
                         """
                     }
                 }
