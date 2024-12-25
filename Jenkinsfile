@@ -13,7 +13,7 @@ pipeline {
         stage('Deploy to Dev') {
             when {
                 expression { 
-                    return env.GIT_BRANCH == '~/dev' 
+                    return env.GIT_BRANCH == 'origin/dev' 
                 }
             }
             steps {
@@ -31,7 +31,7 @@ pipeline {
         stage('Deploy to Test') {
             when {
                 expression { 
-                    return env.GIT_BRANCH == '~/testing' 
+                    return env.GIT_BRANCH == 'origin/testing' 
                 }
             }
             steps {
