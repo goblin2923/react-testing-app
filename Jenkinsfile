@@ -34,11 +34,11 @@ pipeline {
                 script {
                     try {
                         echo 'Building the app on the EC2 instance...'
-                        withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
+                        withCredentials([sshUserPrivateKey(credentialsId: 'github-ssh-key', keyFileVariable: 'GIT_SSH_KEY')]) {
                             bat """
                             echo Building the app on EC2...
-                            icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
-                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "mkdir -p ${env.APP_DIR} && cd ${env.APP_DIR} && git clone git@github.com:goblin2923/react-testing-app.git . && npm install && npm run build"
+                            icacls "%GIT_SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
+                            ssh -i "%GIT_SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "mkdir -p ${env.APP_DIR} && cd ${env.APP_DIR} && git clone git@github.com:goblin2923/react-testing-app.git . && npm install && npm run build"
                             """
                         }
                     } catch (Exception e) {
