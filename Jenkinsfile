@@ -38,22 +38,22 @@ pipeline {
                         bat """
                             rem Ensure SSH permissions for EC2 access
                             icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
-                            
-                            rem Connect to EC2 and build the app
-                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "
+
+                            rem Connect to EC2 and execute commands
+                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} bash -c "'
                                 mkdir -p ${env.APP_DIR} &&
                                 cd ${env.APP_DIR} &&
                                 rm -rf * &&
                                 git clone https://github.com/goblin2923/react-testing-app.git . &&
                                 npm install &&
                                 npm run build
-                            "
+                            '"
                         """
                     }
                 }
             }
         }
-    }
+
 
     post {
         success {
