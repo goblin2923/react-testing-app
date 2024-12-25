@@ -5,7 +5,7 @@ pipeline {
         TEST_SERVER = 'ubuntu@43.204.112.13'
         APP_DIR = '/var/www/app'
         SSH_CREDENTIALS_ID = 'es2-key-pub'
-        GITHUB_SSH_KEY = 'github-ssh-key'
+        GITHUB_SSH_KEY = 'react-github-token'
         GIT_REPO = 'https://github.com/goblin2923/react-testing-app.git'
     }
     
