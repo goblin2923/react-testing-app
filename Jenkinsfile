@@ -30,37 +30,26 @@ pipeline {
             }
         }
 
-        stage('Build App on EC2') {
-            steps {
-                script {
-                    echo 'Building the app on the EC2 instance...'
-                    withCredentials([
-                        sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY'),
-                        sshUserPrivateKey(credentialsId: env.GITHUB_SSH_KEY, keyFileVariable: 'GIT_SSH_KEY')
-                    ]) {
-                        bat """
-                            echo Building the app on EC2...
-                            
-                            rem First, copy the GitHub SSH key to the EC2 instance
-                            scp -i "%SSH_KEY%" -o StrictHostKeyChecking=no "%GIT_SSH_KEY%" ${env.DEV_SERVER}:~/github_key
-                            
-                            rem Then use the copied key for Git operations
-                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "
-                                chmod 600 ~/github_key
-                                eval \$(ssh-agent -s)
-                                ssh-add ~/github_key
-                                mkdir -p ${env.APP_DIR}
-                                cd ${env.APP_DIR}
-                                ssh-keyscan github.com >> ~/.ssh/known_hosts
-                                GIT_SSH_COMMAND='ssh -i ~/github_key' git clone git@github.com:goblin2923/react-testing-app.git .
-                                npm install
-                                npm run build
-                            "
-                        """
-                    }
+       stage('Build App on EC2') {
+    steps {
+        script {
+            try {
+                echo 'Building the app on the EC2 instance...'
+                withCredentials([sshUserPrivateKey(credentialsId: env.GITHUB_SSH_KEY, keyFileVariable: 'GIT_SSH_KEY')]) {
+                    bat """
+                    echo Building the app on EC2...
+                    icacls "%GIT_SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
+                    type "%GIT_SSH_KEY%"  // Add this line to print the SSH key for debugging
+                    ssh -i "%GIT_SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "mkdir -p ${env.APP_DIR} && cd ${env.APP_DIR} && ssh-keyscan github.com >> ~/.ssh/known_hosts && git clone git@github.com:goblin2923/react-testing-app.git . && npm install && npm run build"
+                    """
                 }
+            } catch (Exception e) {
+                error "Docker build failed: ${e.getMessage()}"
             }
         }
+    }
+}
+
         stage('Deploy App on EC2') {
             steps {
                 script {
