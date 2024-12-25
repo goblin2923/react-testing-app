@@ -11,7 +11,9 @@ pipeline {
     stages {
         stage('Deploy to Dev') {
             when {
-                branch 'dev'
+                expression { 
+                    return env.GIT_BRANCH == 'origin/dev' 
+                }
             }
             steps {
                 script {
@@ -27,7 +29,9 @@ pipeline {
         
         stage('Deploy to Test') {
             when {
-                branch 'testing'
+                expression { 
+                    return env.GIT_BRANCH == 'origin/testing' 
+                }
             }
             steps {
                 script {
