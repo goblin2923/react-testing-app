@@ -30,25 +30,47 @@ pipeline {
             }
         }
 
-        stage('Build App on EC2') {
-            steps {
-                script {
-                    echo 'Building the app on the EC2 instance...'
-                    sshagent(credentials: ['github-ssh-key']) {
-                        sh '''
-                        ssh -o StrictHostKeyChecking=no ubuntu@13.233.144.106 "
-                            mkdir -p /var/www/app &&
-                            cd /var/www/app &&
-                            ssh-keyscan github.com >> ~/.ssh/known_hosts &&
-                            git clone git@github.com:goblin2923/react-testing-app.git . &&
-                            npm install &&
+       stage('Build App on EC2') {
+        steps {
+            script {
+                echo 'Building the app on the EC2 instance...'
+                withCredentials([
+                    sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY'),
+                    sshUserPrivateKey(credentialsId: env.GITHUB_SSH_KEY, keyFileVariable: 'GIT_SSH_KEY')
+                ]) {
+                    bat """
+                        echo Building the app on EC2...
+                        
+                        rem Copy GitHub SSH key to EC2
+                        scp -i "%SSH_KEY%" -o StrictHostKeyChecking=no "%GIT_SSH_KEY%" ${env.DEV_SERVER}:~/github_key
+                        
+                        rem Configure and use the key
+                        ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "
+                            chmod 600 ~/github_key
+                            mkdir -p ~/.ssh
+                            eval \$(ssh-agent -s)
+                            ssh-add ~/github_key
+                            
+                            # Configure git
+                            git config --global user.name 'goblin2923'
+                            git config --global user.email 'your-email@example.com'
+                            
+                            mkdir -p ${env.APP_DIR}
+                            cd ${env.APP_DIR}
+                            rm -rf *
+                            ssh-keyscan github.com >> ~/.ssh/known_hosts
+                            
+                            # Use explicit GIT_SSH_COMMAND
+                            export GIT_SSH_COMMAND='ssh -i ~/github_key -o IdentitiesOnly=yes'
+                            git clone git@github.com:goblin2923/react-testing-app.git .
+                            npm install
                             npm run build
                         "
-                        '''
-                    }
+                    """
                 }
             }
         }
+    }
 
 
 
