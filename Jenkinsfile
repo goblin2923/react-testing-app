@@ -33,11 +33,12 @@ pipeline {
         stage('Build App on EC2') {
             steps {
                 script {
-                    sshagent(credentials: [env.GITHUB_SSH_KEY]) {
+                    echo 'Building the app on the EC2 instance...'
+                    sshagent(credentials: ['goblin2923']) {
                         sh '''
-                        ssh -o StrictHostKeyChecking=no ${DEV_SERVER} "
-                            mkdir -p ${APP_DIR} &&
-                            cd ${APP_DIR} &&
+                        ssh -o StrictHostKeyChecking=no ubuntu@13.233.144.106 "
+                            mkdir -p /var/www/app &&
+                            cd /var/www/app &&
                             ssh-keyscan github.com >> ~/.ssh/known_hosts &&
                             git clone git@github.com:goblin2923/react-testing-app.git . &&
                             npm install &&
@@ -48,6 +49,7 @@ pipeline {
                 }
             }
         }
+
 
 
         stage('Deploy App on EC2') {
