@@ -22,7 +22,7 @@ pipeline {
                     withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                         bat """
                             icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
-                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no %TEST_SERVER% "cd ~ && rm -rf react-testing-app && git clone -b testing ${env.GIT_REPO} . && cd react-testing-app && sudo docker-compose down && sudo docker-compose up --build -d"
+                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no %TEST_SERVER% "cd ~ && rm -rf react-testing-app && git clone -b testing ${env.GIT_REPO} && cd react-testing-app && sudo docker-compose down && sudo docker-compose up --build -d"
                         """
                     }
                 }
