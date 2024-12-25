@@ -51,11 +51,11 @@ pipeline {
         }
 
         stage('Merge to Master') {
-            when {
-                expression {
-                    return currentBuild.result == 'SUCCESS'
-                }
-            }
+            // when {
+            //     expression {
+            //         return currentBuild.result == 'SUCCESS'
+            //     }
+            // }
             steps {
                 script {
                     withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
