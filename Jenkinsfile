@@ -14,17 +14,17 @@ pipeline {
             }
         }
         
-        stage('Install Required Tools') {
-            steps {
-                script {
-                    echo 'Installing required tools on the Jenkins server...'
-                    sh 'sudo apt-get update'
-                    sh 'sudo apt-get install -y npm'
-                    sh 'sudo apt-get install -y docker.io'
-                    sh 'sudo apt-get install -y docker-compose'
-                }
-            }
-        }
+        // stage('Install Required Tools') {
+        //     steps {
+        //         script {
+        //             echo 'Installing required tools on the Jenkins server...'
+        //             sh 'sudo apt-get update'
+        //             sh 'sudo apt-get install -y npm'
+        //             sh 'sudo apt-get install -y docker.io'
+        //             sh 'sudo apt-get install -y docker-compose'
+        //         }
+        //     }
+        // }
 
         stage('Test'){
             steps{
