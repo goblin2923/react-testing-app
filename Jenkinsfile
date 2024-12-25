@@ -32,6 +32,7 @@ pipeline {
         stage('Build App on EC2') {
             steps {
                 script {
+                    try{
                     echo 'Building the app on the EC2 instance...'
                     withCredentials([sshUserPrivateKey(credentialsId: 'react-github-token', keyFileVariable: 'GITHUB_SSH_KEY')]) {
                         bat """
@@ -47,6 +48,10 @@ pipeline {
                             "
                         """
                     }
+                    }
+                    catch (Exception e) {
+                    error "Docker build failed: ${e.getMessage()}"
+                }
                 }
             }
         }
