@@ -24,7 +24,7 @@
 
 ## Build and Run with Docker Compose
 
-1. Build the Docker images:
+1. Build the Docker image:
     ```sh
     docker-compose build
     ```
