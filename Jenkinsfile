@@ -4,7 +4,7 @@ pipeline {
     environment {
         DEV_SERVER = 'ubuntu@13.233.144.106'
         SSH_CREDENTIALS_ID = 'es2-key-pub'
-        GITHUB_SSH_KEY = 'github-ssh-key'
+        GITHUB_SSH_KEY = 'git-key-new'
         APP_DIR = '/var/www/app'
     }
 
