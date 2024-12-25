@@ -74,6 +74,8 @@ pipeline {
                                 
                                 # Push the changes to the remote repository
                                 git push origin master  
+
+                                echo 'Merged testing branch into master branch.'
                             '''
                         }
                     }
