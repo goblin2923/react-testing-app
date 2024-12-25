@@ -30,41 +30,42 @@ pipeline {
             }
         }
 
-        stage('Build App on EC2') {
-            steps {
-                script {
-                    echo 'Building the app on the EC2 instance...'
+       stage('Build App on EC2') {
+    steps {
+        script {
+            echo 'Building the app on the EC2 instance...'
 
-                    // Use SSH credentials configured in Jenkins
-                    sshagent(credentials: [env.SSH_CREDENTIALS_ID]) {
-                        sh """
-                        # Copy the private key to the EC2 instance
-                        scp -o StrictHostKeyChecking=no ${env.GIT_SSH_KEY} ${env.DEV_SERVER}:~/.ssh/github_key
+            // Use SSH credentials configured in Jenkins
+            sshagent(credentials: [env.SSH_CREDENTIALS_ID]) {
+                sh """
+                # Copy the private key to the EC2 instance
+                scp -o StrictHostKeyChecking=no ${env.GIT_SSH_KEY} ${env.DEV_SERVER}:~/.ssh/github_key
 
-                        # Configure the key permissions and build the app
-                        ssh -o StrictHostKeyChecking=no ${env.DEV_SERVER} '
-                            # Set correct permissions for the private key
-                            chmod 600 ~/.ssh/github_key
+                # Configure the key permissions and build the app
+                ssh -o StrictHostKeyChecking=no ${env.DEV_SERVER} '
+                    # Set correct permissions for the private key
+                    chmod 600 ~/.ssh/github_key
 
-                            # Add GitHub's host key to known_hosts
-                            mkdir -p ~/.ssh &&
-                            ssh-keyscan github.com >> ~/.ssh/known_hosts
+                    # Add GitHub's host key to known_hosts
+                    mkdir -p ~/.ssh &&
+                    ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-                            # Export the key for use with Git commands
-                            export GIT_SSH_COMMAND="ssh -i ~/.ssh/github_key -o IdentitiesOnly=yes"
+                    # Export the key for use with Git commands
+                    export GIT_SSH_COMMAND="ssh -i ~/.ssh/github_key -o IdentitiesOnly=yes"
 
-                            # Clone the repository, install dependencies, and build the app
-                            mkdir -p ${env.APP_DIR} &&
-                            cd ${env.APP_DIR} &&
-                            git clone git@github.com:goblin2923/react-testing-app.git . &&
-                            npm install &&
-                            npm run build
-                        '
-                        """
-                    }
-                }
+                    # Clone the repository, install dependencies, and build the app
+                    mkdir -p ${env.APP_DIR} &&
+                    cd ${env.APP_DIR} &&
+                    git clone git@github.com:goblin2923/react-testing-app.git . &&
+                    npm install &&
+                    npm run build
+                '
+                """
             }
         }
+    }
+}
+
 
 
 
