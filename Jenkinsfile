@@ -18,7 +18,6 @@ pipeline {
                             icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
                             ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no %DEV_SERVER% "cd ~ && rm -rf react-testing-app && git clone https://github.com/goblin2923/react-testing-app.git && cd react-testing-app && sudo docker-compose down && sudo docker-compose up --build -d"
                         """
-
                     }
                 }
             }
