@@ -14,22 +14,47 @@ pipeline {
             }
         }
         
+        stage('Install Required Tools') {
+            steps {
+                script {
+                    echo 'Installing required tools on the Jenkins server...'
+                    sh 'sudo apt-get update'
+                    sh 'sudo apt-get install -y npm'
+                    sh 'sudo apt-get install -y docker.io'
+                    sh 'sudo apt-get install -y docker-compose'
+                }
+            }
+        }
 
+        stage('Test'){
+            steps{
+                script{
+                    sh '''
+                    echo "Testing SSH Command..."
+                    ssh -o StrictHostKeyChecking=no ${DEV_SERVER} "hostname"
+                    '''
+                }
+            }
+        }
 
         stage('Test SSH Connectivity') {
             steps {
                 script {
                     echo 'Testing SSH connection to the EC2 instance...'
                     sshagent(credentials: [SSH_CREDENTIALS_ID]) {
+                        // Debugging the SSH environment and connection
                         echo "Connecting to: ${DEV_SERVER}"
-                        echo "SSH Command: ssh -o StrictHostKeyChecking=no ${DEV_SERVER}"
+                        echo "Running SSH command..."
+
                         sh '''
-                        ssh -o StrictHostKeyChecking=no ${DEV_SERVER} "echo SSH connection successful"
+                        echo "Trying to SSH into ${DEV_SERVER}..."
+                        ssh -v -o StrictHostKeyChecking=no ${DEV_SERVER} "echo SSH connection successful"
                         '''
                     }
                 }
             }
         }
+
 
 
         stage('Build App on EC2') {
