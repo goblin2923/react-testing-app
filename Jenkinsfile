@@ -4,7 +4,7 @@ pipeline {
     environment {
         DEV_SERVER = 'ubuntu@13.233.144.106'
         SSH_CREDENTIALS_ID = 'es2-key-pub'
-        GITHUB_SSH_KEY = 'git-key-new'
+        GITHUB_SSH_KEY = 'github-ssh-key'
         APP_DIR = '/var/www/app'
     }
 
@@ -30,25 +30,25 @@ pipeline {
             }
         }
 
-       stage('Build App on EC2') {
-    steps {
-        script {
-            try {
-                echo 'Building the app on the EC2 instance...'
-                withCredentials([sshUserPrivateKey(credentialsId: env.GITHUB_SSH_KEY, keyFileVariable: 'GIT_SSH_KEY')]) {
-                    bat """
-                    echo Building the app on EC2...
-                    icacls "%GIT_SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
-                    type "%GIT_SSH_KEY%"  // Add this line to print the SSH key for debugging
-                    ssh -i "%GIT_SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "mkdir -p ${env.APP_DIR} && cd ${env.APP_DIR} && ssh-keyscan github.com >> ~/.ssh/known_hosts && git clone git@github.com:goblin2923/react-testing-app.git . && npm install && npm run build"
-                    """
+        stage('Build App on EC2') {
+            steps {
+                script {
+                    sshagent(credentials: [env.GITHUB_SSH_KEY]) {
+                        sh '''
+                        ssh -o StrictHostKeyChecking=no ${DEV_SERVER} "
+                            mkdir -p ${APP_DIR} &&
+                            cd ${APP_DIR} &&
+                            ssh-keyscan github.com >> ~/.ssh/known_hosts &&
+                            git clone git@github.com:goblin2923/react-testing-app.git . &&
+                            npm install &&
+                            npm run build
+                        "
+                        '''
+                    }
                 }
-            } catch (Exception e) {
-                error "Docker build failed: ${e.getMessage()}"
             }
         }
-    }
-}
+
 
         stage('Deploy App on EC2') {
             steps {
