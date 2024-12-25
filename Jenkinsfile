@@ -50,24 +50,47 @@ pipeline {
             }
         }
 
+        // stage('Merge to Master') {
+        //     // when {
+        //     //     expression {
+        //     //         return currentBuild.result == 'SUCCESS'
+        //     //     }
+        //     // }
+        //     steps {
+        //         script {
+        //             withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
+        //                 sh '''
+        //                     # SSH into the server and merge changes into the master branch
+        //                     icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
+        //                     ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $TEST_SERVER "cd ~/react-testing-app && git fetch origin && git checkout master && git merge origin/testing --no-ff -m 'Merge testing into master' && git push origin master"
+        //                 '''
+        //             }
+        //         }
+        //     }
+        // }
+
         stage('Merge to Master') {
-            // when {
-            //     expression {
-            //         return currentBuild.result == 'SUCCESS'
-            //     }
-            // }
+            when {
+                expression {
+                    return env.GIT_BRANCH == 'origin/testing'
+                }
+            }
             steps {
                 script {
+                    echo 'Building and deploying the app on the EC2 instance...'
                     withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
-                        sh '''
-                            # SSH into the server and merge changes into the master branch
+                        bat """
+                            rem Ensure SSH permissions for EC2 access
                             icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
-                            ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $TEST_SERVER "cd ~/react-testing-app && git fetch origin && git checkout master && git merge origin/testing --no-ff -m 'Merge testing into master' && git push origin master"
-                        '''
+                            
+                            rem Connect to EC2 and execute deployment
+                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.TEST_SERVER} "cd ~/react-testing-app && git checkout master && git merge testing && git push origin master && docker-compose down && docker-compose up --build -d"
+                        """
                     }
                 }
             }
         }
+
     }
     
     post {
