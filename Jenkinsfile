@@ -42,7 +42,6 @@ pipeline {
                 script {
                     echo 'Testing SSH connection to the EC2 instance...'
                     sshagent(credentials: [SSH_CREDENTIALS_ID]) {
-                        // Debugging the SSH environment and connection
                         echo "Connecting to: ${DEV_SERVER}"
                         echo "Running SSH command..."
 
