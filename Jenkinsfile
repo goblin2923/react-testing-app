@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DEV_SERVER = 'ubuntu@13.233.144.106'
-        SSH_CREDENTIALS_ID = 'dev-server-ssh-key'
+        SSH_CREDENTIALS_ID = '2e49be1c-6b70-48d5-a094-b569e7afae66'
         APP_DIR = '/var/www/app'
     }
 
@@ -56,7 +56,7 @@ pipeline {
                 script {
                     echo 'Deploying the app on the EC2 instance...'
                     sshagent (credentials: [SSH_CREDENTIALS_ID]) {
-                        
+
                         echo "Connecting to: ${DEV_SERVER}"
                         sh '''
                         echo "SSH Command: ssh -o StrictHostKeyChecking=no ${DEV_SERVER} 'echo SSH connection successful'"
