@@ -10,6 +10,7 @@ pipeline {
     }
     
     stages {
+        
         stage('Deploy to Test') {
             when {
                 expression { 
@@ -52,14 +53,16 @@ pipeline {
         stage('Merge to Master') {
             when {
                 expression {
-                    return currentBuild.result == null || currentBuild.result == 'SUCCESS'
+                    return currentBuild.result == 'SUCCESS'
                 }
             }
             steps {
                 script {
                     withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                         sh '''
-                            ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $TEST_SERVER "cd react-testing-app && git checkout master && git merge testing && git push origin master"
+                            # SSH into the server and merge changes into the master branch
+                            icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
+                            ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $TEST_SERVER "cd ~/react-testing-app && git fetch origin && git checkout master && git merge origin/testing --no-ff -m 'Merge testing into master' && git push origin master"
                         '''
                     }
                 }
@@ -68,14 +71,8 @@ pipeline {
     }
     
     post {
-        always {
-            echo 'Pipeline execution finished.'
-        }
         failure {
             echo 'Build or deployment failed.'
-        }
-        success {
-            echo 'Build or deployment succeeded!'
         }
     }
 }
