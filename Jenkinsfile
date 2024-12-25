@@ -17,6 +17,7 @@ pipeline {
                     return env.GIT_BRANCH == 'origin/testing' 
                 }
             }
+            
             steps {
                 script {
                     withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
