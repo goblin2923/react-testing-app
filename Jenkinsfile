@@ -5,7 +5,7 @@ pipeline {
         TEST_SERVER = 'ubuntu@43.204.112.13'
         APP_DIR = '/var/www/app'
         SSH_CREDENTIALS_ID = 'es2-key-pub'
-        GITHUB_SSH_KEY = 'github-ssh-key'
+        GITHUB_SSH_KEY = 'testing-ec2-ssh-key'
         GIT_REPO = 'https://github.com/goblin2923/react-testing-app.git'
     }
     
@@ -61,7 +61,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([sshUserPrivateKey(credentialsId: env.GITHUB_SSH_KEY, keyFileVariable: 'GITHUB_KEY')]) {
-                        sshagent (credentials: ['github-ssh-key']) {
+                        sshagent (credentials: ['GITHUB_KEY']) {
                             sh '''
                                 # Checkout the master branch
                                 git checkout master  
