@@ -30,30 +30,30 @@ pipeline {
             }
         }
 
-       stage('Build and Deploy App on EC2') {
+        stage('Build and Deploy App on EC2') {
             steps {
                 script {
                     echo 'Building and deploying the app on the EC2 instance...'
                     withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                         bat """
-                        rem Ensure SSH permissions for EC2 access
-                        icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
-                        
-                        rem Connect to EC2 and build the app
-                        ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "
-                            mkdir -p ${env.APP_DIR} &&
-                            cd ${env.APP_DIR} &&
-                            rm -rf * &&
-                            git clone https://github.com/goblin2923/react-testing-app.git . &&
-                            npm install &&
-                            npm run build
-                        "
+                            rem Ensure SSH permissions for EC2 access
+                            icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
+                            
+                            rem Connect to EC2 and build the app
+                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "
+                                mkdir -p ${env.APP_DIR} &&
+                                cd ${env.APP_DIR} &&
+                                rm -rf * &&
+                                git clone https://github.com/goblin2923/react-testing-app.git . &&
+                                npm install &&
+                                npm run build
+                            "
                         """
                     }
                 }
             }
         }
-
+    }
 
     post {
         success {
@@ -63,6 +63,4 @@ pipeline {
             echo 'Build or deployment failed.'
         }
     }
-    
-}
 }
