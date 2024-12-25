@@ -1,4 +1,4 @@
-# Project Setup Instructions
+# Project Setup Instruction Set
 
 ## Initialize npm in Frontend and Backend Directories
 
