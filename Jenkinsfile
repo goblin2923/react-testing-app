@@ -26,17 +26,6 @@ pipeline {
         //     }
         // }
 
-        stage('Test'){
-            steps{
-                script{
-                    sh '''
-                    echo "Testing SSH Command..."
-                    ssh -o StrictHostKeyChecking=no ${DEV_SERVER} "hostname"
-                    '''
-                }
-            }
-        }
-
         stage('Test SSH Connectivity') {
             steps {
                 script {
