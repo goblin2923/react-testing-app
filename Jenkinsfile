@@ -27,6 +27,27 @@ pipeline {
                 }
             }
         }
+
+        stage('Run Jest Tests') {
+            when {
+                expression { 
+                    return env.GIT_BRANCH == 'origin/testing' 
+                }
+            }
+            steps {
+                script {
+                    withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
+                        bat """
+                            # Run Jest tests
+                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no %TEST_SERVER% "cd ~ && cd react-testing-app && sudo docker-compose exec -T test npm test"
+
+                            # Check Jest Test Results
+                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no %TEST_SERVER% "if [ $? -eq 0 ]; then echo 'Tests passed. Proceeding to Main Environment.'; else echo 'Tests failed. Stopping deployment.'; exit 1; fi"
+                        """
+                    }
+                }
+            }
+        }
     }
     
     post {
