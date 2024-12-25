@@ -33,16 +33,24 @@ pipeline {
             steps {
                 script {
                     echo 'Building the app on the EC2 instance...'
-                    withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'react-github-token', keyFileVariable: 'GITHUB_SSH_KEY')]) {
                         bat """
                             icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
                             rem Build app on EC2
-                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "mkdir -p ${env.APP_DIR} && cd ${env.APP_DIR} && git clone git@github.com:goblin2923/react-testing-app.git . && npm install && npm run build"
+                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "
+                                mkdir -p ${env.APP_DIR} &&
+                                cd ${env.APP_DIR} &&
+                                git config --global core.sshCommand 'ssh -i ${GITHUB_SSH_KEY} -o StrictHostKeyChecking=no' &&
+                                git clone git@github.com:goblin2923/react-testing-app.git . &&
+                                npm install &&
+                                npm run build
+                            "
                         """
                     }
                 }
             }
         }
+
 
         stage('Deploy App on EC2') {
             steps {
