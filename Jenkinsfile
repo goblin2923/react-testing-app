@@ -30,7 +30,7 @@ pipeline {
             }
         }
 
-        stage('Build and Deploy App on EC2') {
+       stage('Build and Deploy App on EC2') {
             steps {
                 script {
                     echo 'Building and deploying the app on the EC2 instance...'
@@ -55,6 +55,7 @@ pipeline {
         }
 
 
+
     post {
         success {
             echo 'Build and deployment succeeded!'
@@ -63,4 +64,6 @@ pipeline {
             echo 'Build or deployment failed.'
         }
     }
+    
+}
 }
