@@ -4,6 +4,7 @@ pipeline {
     environment {
         DEV_SERVER = 'ubuntu@13.233.144.106'
         SSH_CREDENTIALS_ID = 'es2-key-pub'
+        GITHUB_SSH_KEY = 'github-ssh-key'
         APP_DIR = '/var/www/app'
     }
 
@@ -34,7 +35,7 @@ pipeline {
                 script {
                     try {
                         echo 'Building the app on the EC2 instance...'
-                        withCredentials([sshUserPrivateKey(credentialsId: 'github-ssh-key', keyFileVariable: 'GIT_SSH_KEY')]) {
+                        withCredentials([sshUserPrivateKey(credentialsId: env.GITHUB_SSH_KEY, keyFileVariable: 'GIT_SSH_KEY')]) {
                             bat """
                             echo Building the app on EC2...
                             icacls "%GIT_SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
