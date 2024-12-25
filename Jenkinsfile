@@ -3,19 +3,13 @@ pipeline {
     
     environment {
         DEV_SERVER = 'ubuntu@13.233.144.106'
-        TEST_SERVER = 'ubuntu@43.204.112.13'
+
+        SSH_CREDENTIALS_ID = 'dev-server-ssh-key'
         APP_DIR = '/var/www/app'
-        SSH_CREDENTIALS_ID = 'es2-key-pub'
-        GITHUB_SSH_KEY = 'github-ssh-key'
     }
-    
+
     stages {
-        stage('Deploy to Dev') {
-            when {
-                expression { 
-                    return env.GIT_BRANCH == 'origin/dev' 
-                }
-            }
+        stage('Checkout Code') {
             steps {
                 script {
                     withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
