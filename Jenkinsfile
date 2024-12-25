@@ -30,47 +30,41 @@ pipeline {
             }
         }
 
-       stage('Build App on EC2') {
-        steps {
-            script {
-                echo 'Building the app on the EC2 instance...'
-                withCredentials([
-                    sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY'),
-                    sshUserPrivateKey(credentialsId: env.GITHUB_SSH_KEY, keyFileVariable: 'GIT_SSH_KEY')
-                ]) {
-                    bat """
-                        echo Building the app on EC2...
-                        
-                        rem Copy GitHub SSH key to EC2
-                        scp -i "%SSH_KEY%" -o StrictHostKeyChecking=no "%GIT_SSH_KEY%" ${env.DEV_SERVER}:~/github_key
-                        
-                        rem Configure and use the key
-                        ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "
-                            chmod 600 ~/github_key
-                            mkdir -p ~/.ssh
-                            eval \$(ssh-agent -s)
-                            ssh-add ~/github_key
-                            
-                            # Configure git
-                            git config --global user.name 'goblin2923'
-                            git config --global user.email 'your-email@example.com'
-                            
-                            mkdir -p ${env.APP_DIR}
-                            cd ${env.APP_DIR}
-                            rm -rf *
+        stage('Build App on EC2') {
+            steps {
+                script {
+                    echo 'Building the app on the EC2 instance...'
+
+                    // Use SSH credentials configured in Jenkins
+                    sshagent(credentials: [env.SSH_CREDENTIALS_ID]) {
+                        sh """
+                        # Copy the private key to the EC2 instance
+                        scp -o StrictHostKeyChecking=no ${env.GIT_SSH_KEY} ${env.DEV_SERVER}:~/.ssh/github_key
+
+                        # Configure the key permissions and build the app
+                        ssh -o StrictHostKeyChecking=no ${env.DEV_SERVER} '
+                            # Set correct permissions for the private key
+                            chmod 600 ~/.ssh/github_key
+
+                            # Add GitHub's host key to known_hosts
+                            mkdir -p ~/.ssh &&
                             ssh-keyscan github.com >> ~/.ssh/known_hosts
-                            
-                            # Use explicit GIT_SSH_COMMAND
-                            export GIT_SSH_COMMAND='ssh -i ~/github_key -o IdentitiesOnly=yes'
-                            git clone git@github.com:goblin2923/react-testing-app.git .
-                            npm install
+
+                            # Export the key for use with Git commands
+                            export GIT_SSH_COMMAND="ssh -i ~/.ssh/github_key -o IdentitiesOnly=yes"
+
+                            # Clone the repository, install dependencies, and build the app
+                            mkdir -p ${env.APP_DIR} &&
+                            cd ${env.APP_DIR} &&
+                            git clone git@github.com:goblin2923/react-testing-app.git . &&
+                            npm install &&
                             npm run build
-                        "
-                    """
+                        '
+                        """
+                    }
                 }
             }
         }
-    }
 
 
 
