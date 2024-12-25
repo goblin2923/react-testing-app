@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DEV_SERVER = 'ubuntu@13.233.144.106'
-        SSH_CREDENTIALS_ID = 'es2-key-pub'
+        SSH_CREDENTIALS_ID = 'es2-key-pub' // Matched to the credential ID from the logs
         APP_DIR = '/var/www/app'
     }
 
@@ -20,12 +20,7 @@ pipeline {
                     echo 'Testing SSH connection to the EC2 instance...'
                     withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                         bat """
-                            echo Creating secure key file...
-                            copy /Y "%SSH_KEY%" ssh_key.tmp
-                            icacls ssh_key.tmp /inheritance:r
-                            icacls ssh_key.tmp /grant:r "SYSTEM:R" /grant:r "JENKINS:R"
-                            ssh -v -i "ssh_key.tmp" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "echo SSH connection successful"
-                            del ssh_key.tmp
+                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "echo SSH connection successful"
                         """
                     }
                 }
@@ -38,12 +33,7 @@ pipeline {
                     echo 'Building the app on the EC2 instance...'
                     withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                         bat """
-                            echo Creating secure key file...
-                            copy /Y "%SSH_KEY%" ssh_key.tmp
-                            icacls ssh_key.tmp /inheritance:r
-                            icacls ssh_key.tmp /grant:r "SYSTEM:R" /grant:r "JENKINS:R"
-                            ssh -i "ssh_key.tmp" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "mkdir -p ${env.APP_DIR} && cd ${env.APP_DIR} && git clone https://github.com/goblin2923/react-testing-app.git . && npm install && npm run build"
-                            del ssh_key.tmp
+                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "mkdir -p ${env.APP_DIR} && cd ${env.APP_DIR} && git clone https://github.com/goblin2923/react-testing-app.git . && npm install && npm run build"
                         """
                     }
                 }
@@ -56,12 +46,7 @@ pipeline {
                     echo 'Deploying the app on the EC2 instance...'
                     withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                         bat """
-                            echo Creating secure key file...
-                            copy /Y "%SSH_KEY%" ssh_key.tmp
-                            icacls ssh_key.tmp /inheritance:r
-                            icacls ssh_key.tmp /grant:r "SYSTEM:R" /grant:r "JENKINS:R"
-                            ssh -i "ssh_key.tmp" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "cd ${env.APP_DIR} && docker-compose up -d"
-                            del ssh_key.tmp
+                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.DEV_SERVER} "cd ${env.APP_DIR} && docker-compose up -d"
                         """
                     }
                 }
@@ -72,15 +57,9 @@ pipeline {
     post {
         success {
             echo 'Build and deployment succeeded!'
-            script {
-                bat "if exist ssh_key.tmp del ssh_key.tmp"
-            }
         }
         failure {
             echo 'Build or deployment failed.'
-            script {
-                bat "if exist ssh_key.tmp del ssh_key.tmp"
-            }
         }
     }
 }
