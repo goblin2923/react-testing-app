@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DEV_SERVER = 'ubuntu@13.233.144.106'
-        SSH_CREDENTIALS_ID = '2e49be1c-6b70-48d5-a094-b569e7afae66'
+        SSH_CREDENTIALS_ID = 'es2-key-pub'
         APP_DIR = '/var/www/app'
     }
 
