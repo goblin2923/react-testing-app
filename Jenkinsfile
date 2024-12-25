@@ -22,8 +22,8 @@ pipeline {
                     echo 'Testing SSH connection to the EC2 instance...'
                     sshagent(credentials: [SSH_CREDENTIALS_ID]) {
                         echo "Connecting to: ${DEV_SERVER}"
+                        echo "SSH Command: ssh -o StrictHostKeyChecking=no ${DEV_SERVER}"
                         sh '''
-                        echo "SSH Command: ssh -o StrictHostKeyChecking=no ${DEV_SERVER} 'echo SSH connection successful'"
                         ssh -o StrictHostKeyChecking=no ${DEV_SERVER} "echo SSH connection successful"
                         '''
                     }
@@ -58,12 +58,12 @@ pipeline {
                     sshagent (credentials: [SSH_CREDENTIALS_ID]) {
 
                         echo "Connecting to: ${DEV_SERVER}"
+                        echo "SSH Command: ssh -o StrictHostKeyChecking=no ${DEV_SERVER}"
                         sh '''
-                        echo "SSH Command: ssh -o StrictHostKeyChecking=no ${DEV_SERVER} 'echo SSH connection successful'"
                         ssh -o StrictHostKeyChecking=no ${DEV_SERVER} "echo SSH connection successful"
                         '''
-                                    sh '''
-                        ssh -o StrictHostKeyChecking=no ${DEV_SERVER} "
+                        sh '''
+                            ssh -o StrictHostKeyChecking=no ${DEV_SERVER} "
                             cd ${APP_DIR} &&
                             docker-compose up -d"
                         '''
