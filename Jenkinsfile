@@ -1,55 +1,38 @@
 pipeline {
     agent any
-
+    
     environment {
         DEV_SERVER = 'ubuntu@13.233.144.106'
-        SSH_CREDENTIALS_ID = 'dev-server-ssh-key'
+        TEST_SERVER = 'ubuntu@43.204.112.13'
         APP_DIR = '/var/www/app'
+        SSH_CREDENTIALS_ID = 'es2-key-pub'
+        GITHUB_SSH_KEY = 'github-ssh-key'
     }
-
+    
     stages {
-        stage('Checkout Code') {
-            steps {
-                echo 'Fetching code from the dev branch...'
-                git branch: 'dev', 
-                    url: 'git@github.com:goblin2923/react-testing-app', 
-                    credentialsId: 'react-ssh-key'
+        
+        stage('Deploy to Test') {
+            when {
+                expression { 
+                    return env.GIT_BRANCH == 'origin/testing' 
+                }
             }
-        }
-
-        stage('Build Docker Images') {
             steps {
-                echo 'Building Docker images...'
-                bat 'docker-compose build'
-            }
-        }
-
-        stage('Deploy to Dev Environment') {
-            steps {
-                echo 'Deploying application to the Dev environment...'
-                withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
-                    // Using Windows-compatible commands
-                    bat """
-                        echo "Creating directory on remote server..."
-                        ssh -i "%SSH_KEY%" ${DEV_SERVER} "mkdir -p ${APP_DIR}"
-                        
-                        echo "Copying files to remote server..."
-                        scp -i "%SSH_KEY%" -r .\\build\\* ${DEV_SERVER}:${APP_DIR}/
-                        
-                        echo "Starting Docker containers on remote server..."
-                        ssh -i "%SSH_KEY%" ${DEV_SERVER} "cd ${APP_DIR} && docker-compose up -d"
-                    """
+                script {
+                    withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
+                        bat """
+                            icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
+                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no %TEST_SERVER% "cd ~ && rm -rf react-testing-app && git clone -b testing https://github.com/goblin2923/react-testing-app.git && cd react-testing-app && sudo docker-compose down && sudo docker-compose up --build -d"
+                        """
+                    }
                 }
             }
         }
     }
-
+    
     post {
-        success {
-            echo 'Deployment to Dev environment succeeded!'
-        }
         failure {
-            echo 'Deployment to Dev environment failed.'
+            echo 'Build or deployment failed.'
         }
     }
 }
