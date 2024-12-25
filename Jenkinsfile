@@ -34,7 +34,7 @@ pipeline {
                 script {
                     try{
                     echo 'Building the app on the EC2 instance...'
-                    withCredentials([sshUserPrivateKey(credentialsId: 'react-github-token', keyFileVariable: 'GITHUB_SSH_KEY')]) {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'github-ssh-key', keyFileVariable: 'GITHUB_SSH_KEY')]) {
                         bat """
                             icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
                             rem Build app on EC2
