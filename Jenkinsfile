@@ -5,7 +5,8 @@ pipeline {
         DEV_SERVER = 'ubuntu@13.233.144.106'
         TEST_SERVER = 'ubuntu@43.204.112.13'
         APP_DIR = '/var/www/app'
-        SSH_CREDENTIALS_ID = 'EC2-SSH-KEY'
+        SSH_CREDENTIALS_ID = 'es2-key-pub'
+        GITHUB_SSH_KEY = 'github-ssh-key'
     }
     
     stages {
