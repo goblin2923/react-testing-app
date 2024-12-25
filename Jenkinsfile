@@ -10,7 +10,6 @@ pipeline {
     }
     
     stages {
-        
         stage('Deploy to Test') {
             when {
                 expression { 
@@ -53,15 +52,14 @@ pipeline {
         stage('Merge to Master') {
             when {
                 expression {
-                    return currentBuild.result == 'SUCCESS'
+                    return currentBuild.result == null || currentBuild.result == 'SUCCESS'
                 }
             }
             steps {
                 script {
                     withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                         sh '''
-                            # SSH into the server and merge changes into the master branch
-                            ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $TEST_SERVER "cd ~/react-testing-app && git checkout master && git merge testing && git push origin master"
+                            ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $TEST_SERVER "cd react-testing-app && git checkout master && git merge testing && git push origin master"
                         '''
                     }
                 }
@@ -70,8 +68,14 @@ pipeline {
     }
     
     post {
+        always {
+            echo 'Pipeline execution finished.'
+        }
         failure {
             echo 'Build or deployment failed.'
+        }
+        success {
+            echo 'Build or deployment succeeded!'
         }
     }
 }
