@@ -65,7 +65,7 @@ pipeline {
                             icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
                             
                             rem Connect to EC2 and execute deployment
-                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.TEST_SERVER} "cd ~/react-testing-app && git checkout master && git merge testing && git push origin master && docker-compose down && docker-compose up --build -d"
+                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.TEST_SERVER} "cd ~/react-testing-app &&  git remote set-url origin git@github.com:goblin2923/react-testing-app.git && git checkout master && git merge testing && git push origin master && docker-compose down && docker-compose up --build -d"
                         """
                     }
                 }
