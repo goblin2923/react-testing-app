@@ -1,17 +1,11 @@
 pipeline {
     agent any
     
-    
     environment {
-        TEST_SERVER = 'ubuntu@43.204.112.13'
         TEST_SERVER = 'ubuntu@43.204.112.13'
         DEV_SERVER = 'ubuntu@13.233.144.106'
         STAGING_SERVER = 'ubuntu@43.204.216.104'
-        STAGING_SERVER = 'ubuntu@43.204.216.104'
         APP_DIR = '/var/www/app'
-        SSH_CREDENTIALS_ID = 'es2-key-pub'
-        GITHUB_SSH_KEY = 'testing-ec2-ssh-key'
-        GIT_REPO = 'https://github.com/goblin2923/react-testing-app.git'
         SSH_CREDENTIALS_ID = 'es2-key-pub'
         GITHUB_SSH_KEY = 'testing-ec2-ssh-key'
         GIT_REPO = 'https://github.com/goblin2923/react-testing-app.git'
@@ -117,7 +111,6 @@ pipeline {
         }
 
     }
-    
     
     post {
         failure {
