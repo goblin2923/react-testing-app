@@ -50,6 +50,7 @@ pipeline {
             }
         }
 
+
         stage('Merge to Master') {
             when {
                 expression {
@@ -65,7 +66,7 @@ pipeline {
                             icacls "%SSH_KEY%" /inheritance:r /grant:r "SYSTEM:F"
                             
                             rem Connect to EC2 and execute deployment
-                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.TEST_SERVER} "cd ~/react-testing-app && git checkout master && git merge testing && export GIT_SSH_COMMAND='ssh -i ~/.ssh/github_key -o IdentitiesOnly=yes' && git push origin master && docker-compose down && docker-compose up --build -d"
+                            ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no ${env.TEST_SERVER} "cd ~/react-testing-app && git checkout master && git merge testing && git push origin master && docker-compose down && docker-compose up --build -d"
                         """
                     }
                 }
