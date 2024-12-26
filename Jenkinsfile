@@ -10,7 +10,7 @@ pipeline {
         GITHUB_SSH_KEY = 'testing-ec2-ssh-key'
         GIT_REPO = 'https://github.com/goblin2923/react-testing-app.git'
     }
-    
+
     stages {
 
         stage('Dev to Deploy') {
