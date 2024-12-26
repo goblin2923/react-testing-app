@@ -13,7 +13,7 @@ pipeline {
     
     stages {
 
-        stage('Dev to Deploy') {
+        stage('Dev to Deploy: Dev-EC2') {
             when {
                 expression { 
                     return env.GIT_BRANCH == 'origin/dev' 
@@ -31,7 +31,7 @@ pipeline {
             }
         }
     
-        stage('Deploy to Test') {
+        stage('Testing to Deploy: Testing-EC2') {
             when {
                 expression { 
                     return env.GIT_BRANCH == 'origin/testing' 
@@ -49,7 +49,7 @@ pipeline {
             }
         }
 
-        stage('Run Jest Tests') {
+        stage('Testing-EC2: Run Jest Tests') {
             when {
                 expression { 
                     return env.GIT_BRANCH == 'origin/testing' 
@@ -70,7 +70,7 @@ pipeline {
             }
         }
 
-        stage('Merge to Master') {
+        stage('Testing-EC2: Merge to Master') {
             when {
                 expression {
                     return env.GIT_BRANCH == 'origin/testing'
@@ -92,7 +92,7 @@ pipeline {
             }
         }
 
-        stage('Master to Staging') {
+        stage('Master to Deploy: Staging-EC2') {
             when {
                 expression { 
                     return env.GIT_BRANCH == 'origin/master' 
