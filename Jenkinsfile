@@ -50,7 +50,6 @@ pipeline {
             }
         }
 
-
         stage('Merge to Master') {
             when {
                 expression {
