@@ -1,6 +1,6 @@
 # Project Setup Instructions
 
-## Initialize npm in Frontend and Backend Directorie
+## Initialize npm in Frontend and Backend Directories
 
 1. Navigate to the frontend directory:
     ```sh
